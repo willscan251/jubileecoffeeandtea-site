@@ -1,18 +1,42 @@
-<!DOCTYPE html>
+<DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home – Jubilee Coffee & Tea</title>
+  <title>Jubilee Coffee & Tea</title>
+  <meta name="description" content="Welcome to Jubilee Coffee & Tea - A legacy reborn with premium coffee, tea, and merchandise. A taste of jubilee in every cup.">
+  
+  <!-- Standard favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+
+  <!-- Apple “Add to Home” icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+
+  <!-- Safari pinned-tab icon -->
+  <link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg" color="#F5C16C">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="site.webmanifest">
+
+    <!-- Tile & theme colors -->
+  <meta name="msapplication-TileColor" content="#123945">
+  <meta name="theme-color" content="#123945">
+
+
+  <!-- External Resources -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/jct.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/jct.css">
 </head>
 <body>
+
   <!-- NAVBAR -->
   <header>
     <div class="navbar">
       <a href="jct.html" class="brand">
-        <img src="assets/images/jct.png" alt="Jubilee Coffee & Tea Logo" class="logo"/>
+              <img class="logo" src="/assets/images/jct.png" alt="JCT Logo">
         <span class="brand-name">Jubilee Coffee & Tea</span>
       </a>
       <nav id="mobile-nav">
@@ -20,105 +44,194 @@
         <a href="tea.html" class="nav-link">Tea</a>
         <a href="merch.html" class="nav-link">Merch</a>
         <a href="contact.html" class="nav-link">Contact</a>
+        <a href="cart.html" class="nav-link cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart <span id="cart-count">0</span>
+        </a>
       </nav>
-      <button class="mobile-menu-toggle" id="mobile-toggle">
+      <button class="mobile-menu-toggle" id="mobile-toggle" aria-expanded="false" aria-label="Toggle mobile menu">
         <i class="fas fa-bars"></i>
       </button>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
-  <main style="padding-top:5rem;">
-    <section class="page-section active">
-      <div class="mission-box">
-        <div class="home-logo">
-          <img src="assets/images/jct.png" alt="Jubilee Coffee & Tea" class="home-logo-image">
-        </div>
-        <h1>Welcome Home to Jubilee</h1>
-        <p>
-          Every great story begins with a simple dream. Ours started with the belief that 
-          coffee and tea aren't just beverages - they're moments of connection, comfort, and joy.
-        </p>
-        <p style="margin-top: 2rem; font-size: 1.1rem; opacity: 0.9;">
-          After nearly three decades, we're proud to continue the legacy my parents began with love, 
-          dedication, and a homemade coffee cart that brought joy to communities across Alabama. 
-          Now, my mother and I are working together to bring Jubilee back to life for a new generation.
-        </p>
-        <a href="coffee.html" class="cta-button" style="margin-top: 2rem;">Explore Our Family</a>
+  <main id="main-content">
+    <!-- Hero Section -->
+    <div class="page-header home-hero">
+      <div class="home-logo">
+        <img class="home-logo-image" src="assets/images/jct.png" alt="JCT Logo">
       </div>
+      <h1>Welcome Home to Jubilee</h1>
+      <p>
+        Every great story begins with a simple dream. Ours started with the belief that 
+        coffee and tea aren't just beverages - they're moments of connection, comfort, and joy.
+      </p>
+      <p>
+        After nearly three decades, we're proud to continue the legacy my parents began with love, 
+        dedication, and a homemade coffee cart that brought joy to communities across Alabama. 
+        Now, my mother and I are working together to bring Jubilee back to life for a new generation.
+      </p>
+      <a href="coffee.html" class="cta-button">
+        Explore Our Coffee Family
+      </a>
+    </div>
 
-      <!-- Legacy Story Section -->
-      <div class="story-section">
-        <div class="story-container">
-          <h2 class="story-title">A Legacy Reborn</h2>
-          
-          <div class="story-content">
-            <div class="story-card legacy-card">
-              <div class="story-icon">
-                <i class="fas fa-seedling"></i>
-              </div>
-              <div class="story-text">
-                <h3>The Original Dream (1995)</h3>
-                <p>Nearly 30 years ago, my parents started Jubilee Coffee & Tea with nothing but passion, a small mail-order business, and a homemade coffee cart. They brought the joy of exceptional coffee to local festivals and parades across Alabama, building relationships one cup at a time.</p>
-              </div>
+    <!-- Legacy Story Section -->
+    <div class="story-section">
+      <div class="story-container">
+        <h2 class="story-title">A Legacy Reborn</h2>
+        
+        <div class="story-content">
+          <div class="story-card legacy-card">
+            <div class="story-icon">
+              <i class="fas fa-seedling"></i>
             </div>
-
-            <div class="story-card legacy-card">
-              <div class="story-icon">
-                <i class="fas fa-heart"></i>
-              </div>
-              <div class="story-text">
-                <h3>The Foundation They Built</h3>
-                <p>With every festival, every parade, every carefully packaged mail order, my parents weren't just selling coffee - they were creating connections. They understood that great coffee brings people together, creates memories, and becomes part of family traditions.</p>
-              </div>
-            </div>
-
-            <div class="story-card legacy-card">
-              <div class="story-icon">
-                <i class="fas fa-phoenix-bird"></i>
-              </div>
-              <div class="story-text">
-                <h3>Rising Again (2025)</h3>
-                <p>Today, my mother and I are honored to breathe new life into the dream she and my father created. While the world has changed, the heart of Jubilee remains the same - exceptional coffee and tea, genuine care for our customers, and the belief that every cup should be a moment of pure joy.</p>
-              </div>
+            <div class="story-text">
+              <h3>The Original Dream (1995)</h3>
+              <p>Nearly 30 years ago, my parents started Jubilee Coffee & Tea with nothing but passion, a small mail-order business, and a homemade coffee cart. They brought the joy of exceptional coffee to local festivals and parades across Alabama, building relationships one cup at a time.</p>
             </div>
           </div>
 
-          <div class="legacy-quote">
-            <p>"From a homemade cart to your home - the Jubilee spirit lives on."</p>
-            <span>- Pat & Will Scanland, Continuing the Family Legacy</span>
+          <div class="story-card legacy-card">
+            <div class="story-icon">
+              <i class="fas fa-heart"></i>
+            </div>
+            <div class="story-text">
+              <h3>The Foundation They Built</h3>
+              <p>With every festival, every parade, every carefully packaged mail order, my parents weren't just selling coffee - they were creating connections. They understood that great coffee brings people together, creates memories, and becomes part of family traditions.</p>
+            </div>
+          </div>
+
+          <div class="story-card legacy-card">
+            <div class="story-icon">
+              <i class="fas fa-tree"></i>
+            </div>
+            <div class="story-text">
+              <h3>Rising Again (2025)</h3>
+              <p>Today, my mother and I are honored to breathe new life into the dream she and my father created. While the world has changed, the heart of Jubilee remains the same - exceptional coffee and tea, genuine care for our customers, and the belief that every cup should be a moment of pure joy.</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="features">
-        <div class="feature-card">
-          <i class="fas fa-coffee"></i>
-          <h3>Heritage & Quality</h3>
-          <p>Built on 30 years of coffee expertise and family traditions, we continue the legacy of bringing exceptional coffee and tea to families across the South.</p>
+        <div class="legacy-quote">
+          <p>"From a homemade cart to your home - the Jubilee spirit lives on."</p>
+          <span>- Pat & Will Scanland, Continuing the Family Legacy</span>
         </div>
-        <div class="feature-card">
-          <i class="fas fa-home"></i>
-          <h3>From Festivals to Your Home</h3>
-          <p>What started at local parades and festivals now comes directly to your door, carrying the same love and attention that made the original Jubilee special.</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-users"></i>
-          <h3>Family Partnership</h3>
-          <p>My mother and I working together - combining decades of experience with fresh energy to honor the past while building the future of this beloved Alabama coffee company.</p>
-        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="feature-card">
+        <i class="fas fa-coffee"></i>
+        <h3>Heritage & Quality</h3>
+        <p>Built on 30 years of coffee expertise and family traditions, we continue the legacy of bringing exceptional coffee and tea to families across the South.</p>
+      </div>
+      
+      <div class="feature-card">
+        <i class="fas fa-home"></i>
+        <h3>From Festivals to Your Home</h3>
+        <p>What started at local parades and festivals now comes directly to your door, carrying the same love and attention that made the original Jubilee special.</p>
+      </div>
+      
+      <div class="feature-card">
+        <i class="fas fa-users"></i>
+        <h3>Family Partnership</h3>
+        <p>My mother and I working together - combining decades of experience with fresh energy to honor the past while building the future of this beloved Alabama coffee company.</p>
+      </div>
+    </section>
+
+    <!-- Shopping Links Section -->
+    <section class="shopping-links">
+      <div class="page-header">
+        <h2>Start Your Jubilee Journey</h2>
+        <p>Choose your path to discovering the perfect cup</p>
+      </div>
+      
+      <div class="shopping-grid">
+        <a href="coffee.html" class="shopping-card coffee-card">
+          <div class="shopping-icon">
+            <i class="fas fa-coffee"></i>
+          </div>
+          <h3>Premium Coffee</h3>
+          <p>Explore our carefully selected coffee blends from around the world</p>
+          <div class="card-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
+        
+        <a href="tea.html" class="shopping-card tea-card">
+          <div class="shopping-icon">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <h3>Artisan Teas</h3>
+          <p>Discover our collection of premium loose-leaf teas and blends</p>
+          <div class="card-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
+        
+        <a href="merch.html" class="shopping-card merch-card">
+          <div class="shopping-icon">
+            <i class="fas fa-tshirt"></i>
+          </div>
+          <h3>Jubilee Merch</h3>
+          <p>Show your Jubilee love with our comfortable, quality merchandise</p>
+          <div class="card-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
       </div>
     </section>
   </main>
 
   <!-- FOOTER -->
   <footer>
-  <p>"A Taste of Jubilee in Every Cup"</p>
-    <p>
-      A <a href="https://scanland.org" target="_blank" rel="noopener">Scanland</a> Company
-    </p>
+    <p>"A Taste of Jubilee in Every Cup"<br>
+    A <a href="https://scanland.org" target="_blank" rel="noopener">Scanland</a> Company</p>
   </footer>
 
+  <!-- Home Page JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Jubilee Home page loading...');
+      
+      // Simple logo hover effect
+      const homeLogo = document.querySelector('.home-logo-image');
+      if (homeLogo) {
+        homeLogo.addEventListener('mouseenter', function() {
+          this.style.transform = 'scale(1.05) rotate(2deg)';
+        });
+        
+        homeLogo.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1) rotate(0deg)';
+        });
+      }
+      
+      // Shopping card hover effects
+      const shoppingCards = document.querySelectorAll('.shopping-card');
+      shoppingCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) scale(1.02)';
+          const arrow = this.querySelector('.card-arrow');
+          if (arrow) arrow.style.transform = 'translateX(5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+          const arrow = this.querySelector('.card-arrow');
+          if (arrow) arrow.style.transform = 'translateX(0)';
+        });
+      });
+      
+      console.log('Home page ready');
+    });
+  </script>
+
+  <!-- Load main JavaScript -->
   <script src="assets/script.js"></script>
+  <script src="https://cms.scanland.org/cms.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ed31316cbbbb4e68b5364808b4d47f05","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
-</html>
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl509510'},{'dcenter':'p3'},{'cp_id':'10350121'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>
