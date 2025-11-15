@@ -1,0 +1,11 @@
+:root {
+  /* Rich teal with warm coffee-and-sun accents */
+  --color-bg:        #004040;  /* deep teal page background */
+  --color-text:      #EDE1CB;  /* creamy latte copy */
+  --color-primary:   #231A10;  /* dark roast for primary buttons */
+  --color-accent:    #D99D29;  /* sunrise gold highlights */
+  --color-neutral:   #2F7C71;  /* aquamarine for inputs */
+  --color-footer:    #003232;  /* nearly black teal footer */
+  --footer-hover:    #005353;  /* pop of brighter teal hover */
+  --theme-bg: url("images/jctbg.png");
+}

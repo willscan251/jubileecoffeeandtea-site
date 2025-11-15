@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | Jubilee Coffee & Tea</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/jct.css">
+
+    <!-- Standard favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+
+  <!-- Apple “Add to Home” icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+
+  <!-- Safari pinned-tab icon -->
+  <link rel="mask-icon" href="assets/icons/safari-pinned-tab.svg" color="#F5C16C">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="site.webmanifest">
+    
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header>
+    <div class="navbar">
+      <a href="jct.html" class="brand">
+              <img class="logo" src="assets/images/jct.png" alt="JCT Logo">
+        <span class="brand-name">Jubilee Coffee & Tea</span>
+      </a>
+      <nav id="mobile-nav">
+        <a href="coffee.html" class="nav-link">Coffee</a>
+        <a href="tea.html" class="nav-link">Tea</a>
+        <a href="merch.html" class="nav-link">Merch</a>
+        <a href="contact.html" class="nav-link active">Contact</a>
+        <a href="cart.html" class="nav-link cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart <span id="cart-count">0</span>
+        </a>
+      </nav>
+      <button class="mobile-menu-toggle" id="mobile-toggle" aria-expanded="false" aria-label="Toggle mobile menu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <!-- MISSION-BOX banner -->
+    <div class="page-header">
+      <h1>Let's Chat Over Coffee</h1>
+      <p>
+        Got a question? Want to share your coffee story? Or just need a friendly hello? 
+        We're here with open ears and warm hearts - just like you'd find at your favorite local café.
+      </p>
+    </div>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section">
+      <!-- panel for the toggle button -->
+      <div class="contact-panel">
+        <div class="contact-trigger">
+          <span>Contact<br>Jubilee Coffee & Tea</span>
+          <div class="triangle"></div>
+        </div>
+      </div>
+
+      <!-- hidden form -->
+      <div class="contact-body">
+        <form action="https://formspree.io/f/xpwdneok" method="POST">
+          <input type="hidden" name="Note" value="This message was sent from the contact page for Jubilee Coffee & Tea.">
+          <input type="text" name="Name" placeholder="Name" required aria-label="Your name">
+          <input type="email" name="Email" placeholder="Email" required aria-label="Your email">
+          <input type="text" name="Subject" placeholder="Subject" required aria-label="Message subject">
+          <textarea name="Message" placeholder="Message" required aria-label="Your message" rows="5"></textarea>
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Social Media Box -->
+    <div class="social-box">
+      <h3>Connect with us</h3>
+      <ul class="social-list">
+        <li>
+          <a href="https://facebook.com/JubileeCoffeeTea" target="_blank" rel="noopener" aria-label="Follow us on Facebook">
+            <i class="fab fa-facebook"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://instagram.com/JubileeCoffeeTea" target="_blank" rel="noopener" aria-label="Follow us on Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>"A Taste of Jubilee in Every Cup"<br>
+    A <a href="https://scanland.org" target="_blank" rel="noopener">Scanland</a> Company</p>
+  </footer>
+
+  <!-- CONTACT PAGE SPECIFIC SCRIPTS -->
+  <script>
+    // Contact page specific functionality
+    function toggleContact() {
+      var contactSection = document.querySelector('.contact-section');
+      if (contactSection) {
+        contactSection.classList.toggle('open');
+      }
+    }
+
+    function validateContactForm(form) {
+      var nameInput = form.querySelector('input[name="Name"]');
+      var emailInput = form.querySelector('input[name="Email"]');
+      var subjectInput = form.querySelector('input[name="Subject"]');
+      var messageInput = form.querySelector('textarea[name="Message"]');
+      
+      var isValid = true;
+      
+      // Reset styles
+      [nameInput, emailInput, subjectInput, messageInput].forEach(function(input) {
+        if (input) input.style.borderColor = '';
+      });
+      
+      if (!nameInput.value.trim()) {
+        nameInput.style.borderColor = '#dc3545';
+        isValid = false;
+      }
+      
+      if (!emailInput.value.trim() || !emailInput.value.includes('@')) {
+        emailInput.style.borderColor = '#dc3545';
+        isValid = false;
+      }
+      
+      if (!subjectInput.value.trim()) {
+        subjectInput.style.borderColor = '#dc3545';
+        isValid = false;
+      }
+      
+      if (!messageInput.value.trim()) {
+        messageInput.style.borderColor = '#dc3545';
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+
+    // Contact page initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Contact page loaded');
+      
+      // Setup contact form toggle
+      var contactTrigger = document.querySelector('.contact-trigger');
+      if (contactTrigger) {
+        contactTrigger.addEventListener('click', toggleContact);
+      }
+      
+      // Enhanced form handling
+      var contactForm = document.querySelector('.contact-body form');
+      if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+          if (!validateContactForm(this)) {
+            e.preventDefault();
+            if (window.showNotification) {
+              window.showNotification('Please fill out all fields correctly', 'error');
+            }
+            return;
+          }
+          
+          var submitBtn = this.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.style.background = '#6c757d';
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            setTimeout(function() {
+              submitBtn.style.background = '';
+              submitBtn.textContent = 'Send Message';
+              submitBtn.disabled = false;
+            }, 3000);
+          }
+        });
+        
+        // Real-time validation
+        var inputs = contactForm.querySelectorAll('input, textarea');
+        for (var i = 0; i < inputs.length; i++) {
+          inputs[i].addEventListener('blur', function() {
+            if (this.value.trim()) {
+              this.style.borderColor = '#28a745';
+            }
+          });
+          
+          inputs[i].addEventListener('focus', function() {
+            this.style.borderColor = '';
+          });
+        }
+      }
+    });
+  </script>
+
+  <!-- Load main JavaScript -->
+  <script src="assets/script.js"></script>
+</body>
+</html>
