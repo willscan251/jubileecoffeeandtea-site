@@ -1,6 +1,7 @@
 /* 
   JUBILEE COFFEE & TEA - FINAL COMPLETE STYLESHEET
   Clean, responsive design with enhanced Shopify integration and carousel support
+  FIXED: Dynamic card heights that show all content
 */
 
 :root {
@@ -226,31 +227,18 @@ nav a.active {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
-  align-items: stretch;
+  align-items: start;
+  grid-auto-rows: minmax(min-content, max-content);
 }
 
-/* ===== FLIP CARD STYLES ===== */
+/* ===== FLIP CARD STYLES - SIMPLIFIED FOR FULL CONTENT ===== */
 .product-card {
   perspective: 1000px;
-  min-height: 620px;
-}
-
-.product-card[data-product-type="coffee"] {
-  min-height: 900px;
-}
-
-.product-card[data-product-type="tea"] {
-  min-height: 850px;
-}
-
-.product-card[data-product-type="merch"] {
-  min-height: 1100px;
 }
 
 .card-inner {
   position: relative;
   width: 100%;
-  height: 100%;
   transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
   transform-style: preserve-3d;
 }
@@ -261,9 +249,7 @@ nav a.active {
 
 .card-front,
 .card-back {
-  position: absolute;
   width: 100%;
-  height: 100%;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--border-radius);
@@ -272,85 +258,85 @@ nav a.active {
 }
 
 .card-front {
-  z-index: 2;
   transform: rotateY(0deg);
   padding: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 .card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
   transform: rotateY(180deg);
   padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-/* Image carousel at top */
-.card-front .product-image-carousel {
-  margin: 0;
-  padding: 2rem 2rem 0 2rem;
-  flex-shrink: 0;
-}
-
-/* Product info fills remaining space */
-.card-front .product-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem 2rem 2rem 2rem;
-  min-height: 0;
-}
-
-/* Title at top with more space */
-.card-front .product-title {
-  margin-bottom: 2rem;
-  flex-shrink: 0;
-}
-
-/* View Details button - the spacer */
-.card-front .flip-btn {
-  margin: 0 0 auto 0;
-  flex-shrink: 0;
-}
-
-/* Options at bottom with generous spacing */
-.card-front .product-options {
-  margin: 2rem 0 1.5rem 0;
-  flex-shrink: 0;
-}
-
-.card-front .option-group {
-  margin-bottom: 1.5rem;
-}
-
-.card-front .option-group:last-child {
-  margin-bottom: 0;
-}
-
-/* Price with more breathing room */
-.card-front .product-price {
-  margin: 0 0 1.5rem 0;
-  padding: 1.5rem;
-  min-height: 70px;
-}
-
-/* Button at very bottom */
-.card-front .product-bottom {
-  margin: 0;
-  padding-top: 0;
-  flex-shrink: 0;
-}
-
-.card-front .add-to-cart-btn {
-  padding: 1.3rem 2rem;
+  min-height: 100%;
 }
 
 /* Hide stock and description on front */
 .card-front .product-description,
 .card-front .product-stock {
   display: none;
+}
+
+/* Card front layout - all content visible */
+.card-front {
+  display: block;
+}
+
+/* Image carousel at top */
+.card-front .product-image-carousel {
+  margin: 0;
+  padding: 2rem 2rem 0 2rem;
+}
+
+/* Product info section */
+.card-front .product-info {
+  padding: 1.5rem 2rem 2rem 2rem;
+}
+
+/* Title */
+.card-front .product-title {
+  margin-bottom: 1.5rem;
+}
+
+/* View Details button */
+.card-front .flip-btn {
+  margin: 1rem 0;
+}
+
+/* Options section */
+.card-front .product-options {
+  margin: 1.5rem 0;
+}
+
+.card-front .option-group {
+  margin-bottom: 1rem;
+}
+
+.card-front .option-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Price display */
+.card-front .product-price {
+  margin: 1.5rem 0;
+  padding: 1rem;
+}
+
+/* Add to cart button at bottom */
+.card-front .product-bottom {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.card-front .add-to-cart-btn {
+  padding: 1.3rem 2rem;
+  margin-bottom: 0;
+}
+
+/* Card back layout */
+.card-back {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Flip button */
@@ -431,7 +417,7 @@ nav a.active {
 .card-back-description ol {
   margin-left: 20px;
   margin-bottom: 15px;
-  font-size: 1rem; /* Slightly smaller for lists */
+  font-size: 1rem;
 }
 
 .card-back-description li {
@@ -465,85 +451,6 @@ nav a.active {
   background: linear-gradient(135deg, var(--color-neutral), var(--color-primary));
   transform: translateY(-2px);
   box-shadow: var(--shadow-medium);
-}
-
-/* Mobile */
-@media (max-width: 850px) {
-  .product-card {
-   min-height: 620px;
-  }
-  
-.product-card[data-product-type="coffee"] {
-  min-height: 900px;
-}
-
-.product-card[data-product-type="tea"] {
-  min-height: 850px;
-}
-
-.product-card[data-product-type="merch"] {
-  min-height: 1100px;
-}
-
-  .card-front,
-  .card-back {
-    padding: 1.5rem;
-  }
-  
-  .flip-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-  
-  .card-back-title {
-    font-size: 1.4rem;
-  }
-  
-  .back-to-front-btn {
-    padding: 12px 24px;
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 850px) {
-  .product-card {
-    min-height: 480px;
-  }
-  
-  .product-card[data-product-type="coffee"] {
-    min-height: 620px;
-  }
-  
-  .product-card[data-product-type="tea"] {
-    min-height: 540px;
-  }
-  
-  .product-card[data-product-type="merch"] {
-    min-height: 600px;
-  }  
-  
-  .card-back {
-    padding: 1.5rem;
-  }
-  
-  .flip-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    margin: 0.75rem 0;
-  }
-  
-  .card-back-title {
-    font-size: 1.4rem;
-  }
-  
-  .card-back-description {
-    font-size: 0.95rem;
-  }
-  
-  .back-to-front-btn {
-    padding: 12px 24px;
-    font-size: 0.95rem;
-  }
 }
 
 /* ===== LOADING & ERROR STATES ===== */
@@ -783,7 +690,7 @@ nav a.active {
 .product-card {
   background: rgba(255, 255, 255, 0.98);
   border-radius: var(--border-radius);
-  padding: 2rem;
+  padding: 0;
   box-shadow: var(--shadow-light);
   transition: var(--transition);
   color: var(--color-primary);
@@ -791,9 +698,6 @@ nav a.active {
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(5px);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
 }
 
 .product-card::before {
@@ -918,12 +822,12 @@ nav a.active {
 .product-options {
   margin: 1rem 0;
   display: flex;
-  flex-direction: column; /* Stack vertically, not side-by-side */
+  flex-direction: column;
   gap: 1rem;
 }
 
 .option-group {
-  width: 100%; /* Full width */
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -2422,6 +2326,31 @@ footer a:hover {
   .product-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+  
+  /* Mobile flip card adjustments */
+  .card-front,
+  .card-back {
+    padding: 1.5rem;
+  }
+  
+  .flip-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    margin: 0.75rem 0;
+  }
+  
+  .card-back-title {
+    font-size: 1.4rem;
+  }
+  
+  .card-back-description {
+    font-size: 0.95rem;
+  }
+  
+  .back-to-front-btn {
+    padding: 12px 24px;
+    font-size: 0.95rem;
   }
   
   .filter-container {

@@ -534,11 +534,11 @@ function updateProductPrice(handle) {
     const compareAtPrice = matchingVariant.compareAtPrice ? 
       parseFloat(matchingVariant.compareAtPrice.amount) : null;
     
-    let priceHtml = `${price.toFixed(2)}`;
+    let priceHtml = `$${price.toFixed(2)}`;
     if (compareAtPrice && compareAtPrice > price) {
       priceHtml = `
-        <span class="sale-price">${price.toFixed(2)}</span>
-        <span class="compare-price">${compareAtPrice.toFixed(2)}</span>
+        <span class="sale-price">$${price.toFixed(2)}</span>
+        <span class="compare-price">$${compareAtPrice.toFixed(2)}</span>
       `;
     }
     
@@ -581,7 +581,7 @@ function updateProductPrice(handle) {
       const variant = variants[0];
       const price = parseFloat(variant.price.amount);
       
-      priceDisplay.textContent = `${price.toFixed(2)}`;
+      priceDisplay.textContent = `$${price.toFixed(2)}`;
       priceDisplay.classList.add('price-active');
       
       const isAvailable = isPrintOnDemand ? true : (variant.availableForSale && variant.quantityAvailable > 0);
@@ -621,6 +621,31 @@ function flipCard(cardId) {
   if (card) {
     card.classList.toggle('flipped');
   }
+}
+
+// ===== AUTOMATIC ALPHABETICAL SORTING =====
+function sortCardsByName(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const cards = Array.from(container.querySelectorAll('.product-card:not(.filtered-out)'));
+  if (cards.length === 0) return;
+  
+  console.log(`Sorting ${cards.length} cards alphabetically in ${containerId}`);
+  
+  // Sort alphabetically by product title
+  cards.sort((a, b) => {
+    const titleA = a.querySelector('.product-title').textContent.trim().toLowerCase();
+    const titleB = b.querySelector('.product-title').textContent.trim().toLowerCase();
+    return titleA.localeCompare(titleB);
+  });
+  
+  // Re-append in sorted order
+  cards.forEach(card => {
+    container.appendChild(card);
+  });
+  
+  console.log('Cards sorted alphabetically');
 }
 
 // ===== CART FUNCTIONS =====
@@ -767,6 +792,7 @@ async function loadCoffeePage() {
     });
     
     renderProducts(coffeeProducts, 'coffee-products', 'coffee');
+    setTimeout(() => sortCardsByName('coffee-products'), 500);
   } catch (error) {
     if (container) {
       container.innerHTML = `
@@ -804,6 +830,7 @@ async function loadTeaPage() {
     });
     
     renderProducts(teaProducts, 'tea-products', 'tea');
+    setTimeout(() => sortCardsByName('tea-products'), 500);
   } catch (error) {
     if (container) {
       container.innerHTML = `
@@ -850,7 +877,10 @@ async function loadMerchPage() {
     });
     
     renderProducts(merchProducts, 'merch-products', 'merch');
-    setTimeout(() => setupMerchFilters(), 500);
+    setTimeout(() => {
+      setupMerchFilters();
+      sortCardsByName('merch-products');
+    }, 500);
   } catch (error) {
     if (container) {
       container.innerHTML = `
@@ -889,6 +919,9 @@ function setupMerchFilters() {
           product.classList.add('filtered-out');
         }
       });
+      
+      // Re-sort alphabetically after filtering
+      setTimeout(() => sortCardsByName('merch-products'), 100);
     };
   });
 }
@@ -1080,3 +1113,4 @@ window.nextSlide = nextSlide;
 window.previousSlide = previousSlide;
 window.showNotification = showNotification;
 window.flipCard = flipCard;
+window.sortCardsByName = sortCardsByName;
