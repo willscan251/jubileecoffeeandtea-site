@@ -1,5 +1,4 @@
 // JUBILEE COFFEE & TEA - COMPLETELY REBUILT SCRIPT
-console.log('Jubilee Coffee & Tea - Clean Rebuild Loading...');
 
 // ===== SHOPIFY CONFIG =====
 const SHOPIFY_CONFIG = {
@@ -447,10 +446,6 @@ function updateProductPrice(handle) {
     return textarea.value;
   };
   
-  // Debug logging
-  console.log('Updating price for:', handle);
-  console.log('Total variants:', variants.length);
-  console.log('First variant structure:', variants[0]);
   
   const selectedOptions = {};
   let allSelected = true;
@@ -468,8 +463,6 @@ function updateProductPrice(handle) {
     }
   });
   
-  console.log('Selected options:', selectedOptions);
-  console.log('All selected:', allSelected);
   
   if (selects.length === 0) {
     const variant = variants[0];
@@ -506,7 +499,6 @@ function updateProductPrice(handle) {
   
   // Improved variant matching with case-insensitive and trimmed comparison
   const matchingVariant = variants.find(variant => {
-    console.log('Checking variant:', variant.title, variant.selectedOptions);
     
     // Check if all selected options match this variant
     const matches = variant.selectedOptions.every(option => {
@@ -514,7 +506,6 @@ function updateProductPrice(handle) {
       const optionValue = option.value.trim().toLowerCase();
       const selectedValue = (selectedOptions[optionName] || '').trim().toLowerCase();
       
-      console.log(`  Comparing ${optionName}: "${selectedValue}" === "${optionValue}"`, selectedValue === optionValue);
       
       return selectedValue === optionValue;
     });
@@ -522,12 +513,10 @@ function updateProductPrice(handle) {
     // Also check that we have the right number of options
     const optionCountMatch = variant.selectedOptions.length === Object.keys(selectedOptions).length;
     
-    console.log('  Matches all options:', matches, 'Option count match:', optionCountMatch);
     
     return matches && optionCountMatch;
   });
   
-  console.log('Matching variant found:', matchingVariant);
   
   if (matchingVariant) {
     const price = parseFloat(matchingVariant.price.amount);
@@ -577,7 +566,6 @@ function updateProductPrice(handle) {
     
     // If there's only one variant, use it regardless
     if (variants.length === 1) {
-      console.log('Only one variant exists, using it as fallback');
       const variant = variants[0];
       const price = parseFloat(variant.price.amount);
       
@@ -631,7 +619,6 @@ function sortCardsByName(containerId) {
   const cards = Array.from(container.querySelectorAll('.product-card:not(.filtered-out)'));
   if (cards.length === 0) return;
   
-  console.log(`Sorting ${cards.length} cards alphabetically in ${containerId}`);
   
   // Sort alphabetically by product title
   cards.sort((a, b) => {
@@ -645,7 +632,6 @@ function sortCardsByName(containerId) {
     container.appendChild(card);
   });
   
-  console.log('Cards sorted alphabetically');
 }
 
 // ===== CART FUNCTIONS =====

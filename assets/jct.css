@@ -2248,7 +2248,7 @@ footer a:hover {
 }
 
 /* ===== MOBILE RESPONSIVE ===== */
-@media (max-width: 850px) {
+@media (max-width: 997px) {
   body {
     padding-top: 70px;
   }
@@ -2946,7 +2946,7 @@ a:focus {
 }
 
 /* MOBILE RESPONSIVE */
-@media (max-width: 768px) {
+@media (max-width: 997px) {
   .newsletter-banner {
     bottom: 190px;
     right: 10px;
