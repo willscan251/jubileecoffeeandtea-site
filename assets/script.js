@@ -1074,10 +1074,209 @@ function initMobileMenu() {
   }
 }
 
+// ===== NEWSLETTER FLIP CARD BANNER =====
+function initNewsletterBanner() {
+  // Check if banner was dismissed
+  const dismissed = localStorage.getItem('jct-newsletter-dismissed');
+  
+  // Don't show if dismissed or on cart/thanks pages
+  const path = window.location.pathname;
+  if (dismissed === 'true' || path.includes('cart') || path.includes('thanks') || path.includes('404')) {
+    return;
+  }
+  
+  // Create flip card banner
+  const banner = document.createElement('div');
+  banner.className = 'newsletter-banner';
+  banner.innerHTML = `
+    <div class="newsletter-card">
+      <!-- FRONT: Initial view with subscribe button -->
+      <div class="newsletter-face newsletter-front">
+        <button class="newsletter-close" aria-label="Close newsletter banner">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="newsletter-icon">
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div class="newsletter-content">
+          <h3>Stay in Touch!</h3>
+          <p>Get the latest on new blends, special offers, and coffee stories</p>
+          <button class="newsletter-cta-btn" id="show-form-btn">
+            <i class="fas fa-paper-plane"></i>
+            Subscribe
+          </button>
+        </div>
+      </div>
+      
+      <!-- BACK: Form view -->
+      <div class="newsletter-face newsletter-back">
+        <button class="newsletter-close" aria-label="Close newsletter banner">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="newsletter-form-container">
+          <h3><i class="fas fa-envelope"></i> Join Our Newsletter</h3>
+          <form id="newsletter-signup-form">
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="Email *" 
+              required 
+              class="newsletter-input"
+            >
+            <input 
+              type="text" 
+              name="firstName" 
+              placeholder="First Name *" 
+              required 
+              class="newsletter-input"
+            >
+            <input 
+              type="text" 
+              name="lastName" 
+              placeholder="Last Name *" 
+              required 
+              class="newsletter-input"
+            >
+            <button type="submit" class="newsletter-submit-btn" id="submit-newsletter">
+              <i class="fas fa-check"></i>
+              Subscribe
+            </button>
+            <button type="button" class="newsletter-back-btn" id="back-to-front">
+              <i class="fas fa-arrow-left"></i>
+              Back
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- THANK YOU: Success view -->
+      <div class="newsletter-face newsletter-thanks">
+        <div class="newsletter-thanks-content">
+          <div class="newsletter-thanks-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h3>Thank You for Subscribing!</h3>
+          <p>You're now part of the Jubilee Coffee & Tea family. Welcome aboard!</p>
+          <button class="newsletter-close-final" id="close-thanks">
+            <i class="fas fa-times"></i>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(banner);
+  
+  // Show banner after 3 seconds
+  setTimeout(function() {
+    banner.classList.add('show');
+  }, 3000);
+  
+  const card = banner.querySelector('.newsletter-card');
+  
+  // Handle close buttons
+  const closeButtons = banner.querySelectorAll('.newsletter-close');
+  closeButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      dismissBanner();
+    });
+  });
+  
+  // Show form button
+  const showFormBtn = document.getElementById('show-form-btn');
+  if (showFormBtn) {
+    showFormBtn.addEventListener('click', function() {
+      card.classList.add('flipped-to-form');
+    });
+  }
+  
+  // Back to front button
+  const backBtn = document.getElementById('back-to-front');
+  if (backBtn) {
+    backBtn.addEventListener('click', function() {
+      card.classList.remove('flipped-to-form');
+    });
+  }
+  
+  // Form submission
+  const form = document.getElementById('newsletter-signup-form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submit-newsletter');
+      const email = form.querySelector('input[name="email"]').value.trim();
+      const firstName = form.querySelector('input[name="firstName"]').value.trim();
+      const lastName = form.querySelector('input[name="lastName"]').value.trim();
+      
+      if (!email || !firstName || !lastName) {
+        return;
+      }
+      
+      // Disable button
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+      
+      // Submit to serverless function
+      fetch('https://zoho-subscribe.wmscanland.workers.dev', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          firstName: firstName,
+          lastName: lastName
+        })
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data.success) {
+          // Flip to thank you
+          card.classList.remove('flipped-to-form');
+          card.classList.add('flipped-to-thanks');
+        } else {
+          alert(data.error || 'Subscription failed. Please try again.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-check"></i> Subscribe';
+        }
+      })
+      .catch(function(error) {
+        console.error('Subscription error:', error);
+        alert('Failed to subscribe. Please try again later.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Subscribe';
+      });
+    });
+  }
+  
+  // Close from thank you
+  const closeThanksBtn = document.getElementById('close-thanks');
+  if (closeThanksBtn) {
+    closeThanksBtn.addEventListener('click', function() {
+      dismissBanner();
+    });
+  }
+  
+  function dismissBanner() {
+    banner.classList.remove('show');
+    setTimeout(function() {
+      banner.style.display = 'none';
+      localStorage.setItem('jct-newsletter-dismissed', 'true');
+    }, 500);
+  }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize mobile menu immediately
   initMobileMenu();
+  
+  // Initialize newsletter banner
+  initNewsletterBanner();
   
   // Load cart
   loadCart();
