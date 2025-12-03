@@ -1227,7 +1227,8 @@ function initNewsletterBanner() {
         body: JSON.stringify({
           email: email,
           firstName: firstName,
-          lastName: lastName
+          lastName: lastName,
+          listKey: '3z83479fe57211af2bba42e538287909728247c69a797566eb2f7d647a6d663d8d'
         })
       })
       .then(function(response) {
