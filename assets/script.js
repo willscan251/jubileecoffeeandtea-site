@@ -1060,201 +1060,209 @@ function initMobileMenu() {
   }
 }
 
-// ===== NEWSLETTER FLIP CARD BANNER =====
+// ===== NEWSLETTER FLOATING WIDGET =====
+// Zoho Configuration for JCT Newsletter
+const ZOHO_CONFIG = {
+  action: 'https://anrcr-zgpvh.maillist-manage.net/weboptin.zc',
+  zx: '135bffd9e',
+  zcld: '1156b347af4ac1ec0',
+  zctd: '1156b347af4ab4f79',
+  formIx: '3z942a48aa15968fb3fe118c8eb392875012ddd0e34460b61e74ef5d3d2807677b'
+};
+
+const FLOAT_DELAY = 3000; // Show after 3 seconds
+const DISMISS_DAYS = 7;   // Don't show again for 7 days after dismiss
+
 function initNewsletterBanner() {
-  // Check if banner was dismissed
-  const dismissed = localStorage.getItem('jct-newsletter-dismissed');
+  // Check if dismissed recently
+  if (isNewsletterDismissed()) return;
   
-  // Don't show if dismissed or on cart/thanks pages
+  // Don't show on cart/thanks/404 pages
   const path = window.location.pathname;
-  if (dismissed === 'true' || path.includes('cart') || path.includes('thanks') || path.includes('404')) {
+  if (path.includes('cart') || path.includes('thanks') || path.includes('404')) {
     return;
   }
   
-  // Create flip card banner
-  const banner = document.createElement('div');
-  banner.className = 'newsletter-banner';
-  banner.innerHTML = `
-    <div class="newsletter-card">
-      <!-- FRONT: Initial view with subscribe button -->
-      <div class="newsletter-face newsletter-front">
-        <button class="newsletter-close" aria-label="Close newsletter banner">
-          <i class="fas fa-times"></i>
-        </button>
-        <div class="newsletter-icon">
-          <i class="fas fa-envelope"></i>
-        </div>
-        <div class="newsletter-content">
-          <h3>Stay in Touch!</h3>
-          <p>Get the latest on new blends, special offers, and coffee stories</p>
-          <button class="newsletter-cta-btn" id="show-form-btn">
-            <i class="fas fa-paper-plane"></i>
-            Subscribe
-          </button>
-        </div>
-      </div>
-      
-      <!-- BACK: Form view -->
-      <div class="newsletter-face newsletter-back">
-        <button class="newsletter-close" aria-label="Close newsletter banner">
-          <i class="fas fa-times"></i>
-        </button>
-        <div class="newsletter-form-container">
-          <h3><i class="fas fa-envelope"></i> Join Our Newsletter</h3>
-          <form id="newsletter-signup-form">
-            <input 
-              type="email" 
-              name="email" 
-              placeholder="Email *" 
-              required 
-              class="newsletter-input"
-            >
-            <input 
-              type="text" 
-              name="firstName" 
-              placeholder="First Name *" 
-              required 
-              class="newsletter-input"
-            >
-            <input 
-              type="text" 
-              name="lastName" 
-              placeholder="Last Name *" 
-              required 
-              class="newsletter-input"
-            >
-            <button type="submit" class="newsletter-submit-btn" id="submit-newsletter">
-              <i class="fas fa-check"></i>
-              Subscribe
-            </button>
-            <button type="button" class="newsletter-back-btn" id="back-to-front">
-              <i class="fas fa-arrow-left"></i>
-              Back
-            </button>
-          </form>
-        </div>
-      </div>
-      
-      <!-- THANK YOU: Success view -->
-      <div class="newsletter-face newsletter-thanks">
-        <div class="newsletter-thanks-content">
-          <div class="newsletter-thanks-icon">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <h3>Thank You for Subscribing!</h3>
-          <p>You're now part of the Jubilee Coffee & Tea family. Welcome aboard!</p>
-          <button class="newsletter-close-final" id="close-thanks">
-            <i class="fas fa-times"></i>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
+  // Create the floating widget
+  const widget = createFloatWidget();
+  document.body.appendChild(widget);
   
-  document.body.appendChild(banner);
-  
-  // Show banner after 3 seconds
+  // Show after delay
   setTimeout(function() {
-    banner.classList.add('show');
-  }, 3000);
+    widget.classList.add('visible');
+  }, FLOAT_DELAY);
   
-  const card = banner.querySelector('.newsletter-card');
+  // Set up interactions
+  const btn = widget.querySelector('.subscribe-float-btn');
+  const panel = widget.querySelector('.subscribe-float-panel');
+  const closeBtn = widget.querySelector('.subscribe-float-close');
+  const form = widget.querySelector('.zoho-subscribe-form');
   
-  // Handle close buttons
-  const closeButtons = banner.querySelectorAll('.newsletter-close');
-  closeButtons.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      dismissBanner();
-    });
+  btn.addEventListener('click', function() {
+    btn.classList.add('hidden');
+    panel.classList.add('active');
+    const firstInput = form.querySelector('input');
+    if (firstInput) firstInput.focus();
   });
   
-  // Show form button
-  const showFormBtn = document.getElementById('show-form-btn');
-  if (showFormBtn) {
-    showFormBtn.addEventListener('click', function() {
-      card.classList.add('flipped-to-form');
+  closeBtn.addEventListener('click', function(e) {
+    if (e.shiftKey) {
+      // Shift+click to dismiss completely
+      dismissNewsletterWidget(widget);
+      setNewsletterDismissed();
+    } else {
+      // Regular click just closes panel
+      panel.classList.remove('active');
+      btn.classList.remove('hidden');
+    }
+  });
+  
+  form.addEventListener('submit', function(e) {
+    handleNewsletterSubmit(e, panel, function() {
+      // After successful subscribe, hide widget after a moment
+      setTimeout(function() {
+        dismissNewsletterWidget(widget);
+        setNewsletterDismissed();
+      }, 3000);
     });
+  });
+}
+
+function createFloatWidget() {
+  var widget = document.createElement('div');
+  widget.className = 'subscribe-float';
+  widget.innerHTML = 
+    '<button type="button" class="subscribe-float-btn">' +
+      '<span class="float-icon"><i class="fas fa-envelope"></i></span>' +
+      '<span class="float-text">Stay in the Jubilee Loop!</span>' +
+    '</button>' +
+    '<div class="subscribe-float-panel">' +
+      '<div class="subscribe-float-header">' +
+        '<h4>Join the Jubilee Family</h4>' +
+        '<button type="button" class="subscribe-float-close">&times;</button>' +
+      '</div>' +
+      '<p>Get the latest on new blends, special offers & coffee stories.</p>' +
+      '<form class="zoho-subscribe-form">' +
+        '<div class="form-row">' +
+          '<input type="text" name="FIRSTNAME" placeholder="First Name" required>' +
+          '<input type="text" name="LASTNAME" placeholder="Last Name" required>' +
+        '</div>' +
+        '<input type="email" name="CONTACT_EMAIL" placeholder="Email Address" required>' +
+        '<div class="form-buttons">' +
+          '<button type="submit" class="subscribe-submit-btn"><i class="fas fa-paper-plane"></i> Subscribe</button>' +
+        '</div>' +
+      '</form>' +
+      '<div class="subscribe-message hidden"></div>' +
+    '</div>';
+  return widget;
+}
+
+function dismissNewsletterWidget(widget) {
+  widget.classList.remove('visible');
+  setTimeout(function() {
+    if (widget.parentNode) widget.remove();
+  }, 400);
+}
+
+function isNewsletterDismissed() {
+  const dismissed = localStorage.getItem('jct_subscribe_dismissed');
+  if (!dismissed) return false;
+  const dismissedDate = new Date(parseInt(dismissed));
+  const now = new Date();
+  const daysDiff = (now - dismissedDate) / (1000 * 60 * 60 * 24);
+  return daysDiff < DISMISS_DAYS;
+}
+
+function setNewsletterDismissed() {
+  localStorage.setItem('jct_subscribe_dismissed', Date.now().toString());
+}
+
+function handleNewsletterSubmit(e, container, onSuccess) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const messageDiv = container.querySelector('.subscribe-message');
+  
+  const formData = new FormData(form);
+  const email = formData.get('CONTACT_EMAIL');
+  const firstName = formData.get('FIRSTNAME') || '';
+  const lastName = formData.get('LASTNAME') || '';
+  
+  // Validate email
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showSubscribeMessage(messageDiv, 'Please enter a valid email address.', 'error');
+    return;
   }
   
-  // Back to front button
-  const backBtn = document.getElementById('back-to-front');
-  if (backBtn) {
-    backBtn.addEventListener('click', function() {
-      card.classList.remove('flipped-to-form');
-    });
+  const originalHTML = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Joining...';
+  submitBtn.disabled = true;
+  
+  // Create hidden iframe for Zoho submission
+  const iframeName = 'zcSignup_' + Date.now();
+  const iframe = document.createElement('iframe');
+  iframe.name = iframeName;
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  
+  // Create form with all Zoho required fields
+  const hiddenForm = document.createElement('form');
+  hiddenForm.method = 'POST';
+  hiddenForm.action = ZOHO_CONFIG.action;
+  hiddenForm.target = iframeName;
+  hiddenForm.style.display = 'none';
+  
+  const fields = {
+    'CONTACT_EMAIL': email,
+    'FIRSTNAME': firstName,
+    'LASTNAME': lastName,
+    'submitType': 'optinCustomView',
+    'emailReportId': '',
+    'formType': 'QuickForm',
+    'zx': ZOHO_CONFIG.zx,
+    'zcvers': '3.0',
+    'oldListIds': '',
+    'mode': 'OptinCreateView',
+    'zcld': ZOHO_CONFIG.zcld,
+    'zctd': ZOHO_CONFIG.zctd,
+    'zc_trackCode': 'ZCFORMVIEW',
+    'zc_formIx': ZOHO_CONFIG.formIx,
+    'viewFrom': 'URL_ACTION'
+  };
+  
+  for (const key in fields) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = fields[key];
+    hiddenForm.appendChild(input);
   }
   
-  // Form submission
-  const form = document.getElementById('newsletter-signup-form');
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const submitBtn = document.getElementById('submit-newsletter');
-      const email = form.querySelector('input[name="email"]').value.trim();
-      const firstName = form.querySelector('input[name="firstName"]').value.trim();
-      const lastName = form.querySelector('input[name="lastName"]').value.trim();
-      
-      if (!email || !firstName || !lastName) {
-        return;
-      }
-      
-      // Disable button
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
-      
-      // Submit to serverless function
-      fetch('https://zoho-subscribe.wmscanland.workers.dev', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: email,
-          firstName: firstName,
-          lastName: lastName,
-          listKey: '3z83479fe57211af2bba42e538287909728247c69a797566eb2f7d647a6d663d8d'
-        })
-      })
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        if (data.success) {
-          // Flip to thank you
-          card.classList.remove('flipped-to-form');
-          card.classList.add('flipped-to-thanks');
-        } else {
-          alert(data.error || 'Subscription failed. Please try again.');
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="fas fa-check"></i> Subscribe';
-        }
-      })
-      .catch(function(error) {
-        console.error('Subscription error:', error);
-        alert('Failed to subscribe. Please try again later.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-check"></i> Subscribe';
-      });
-    });
-  }
+  document.body.appendChild(hiddenForm);
+  hiddenForm.submit();
   
-  // Close from thank you
-  const closeThanksBtn = document.getElementById('close-thanks');
-  if (closeThanksBtn) {
-    closeThanksBtn.addEventListener('click', function() {
-      dismissBanner();
-    });
-  }
-  
-  function dismissBanner() {
-    banner.classList.remove('show');
-    setTimeout(function() {
-      banner.style.display = 'none';
-      localStorage.setItem('jct-newsletter-dismissed', 'true');
-    }, 500);
-  }
+  // Show success after brief delay
+  setTimeout(function() {
+    if (iframe.parentNode) iframe.remove();
+    if (hiddenForm.parentNode) hiddenForm.remove();
+    form.classList.add('hidden');
+    showSubscribeMessage(messageDiv, "Welcome to the Jubilee family! Check your inbox soon.", 'success');
+    form.reset();
+    submitBtn.innerHTML = originalHTML;
+    submitBtn.disabled = false;
+    
+    // Mark as subscribed
+    setNewsletterDismissed();
+    
+    if (typeof onSuccess === 'function') onSuccess();
+  }, 2000);
+}
+
+function showSubscribeMessage(messageDiv, text, type) {
+  messageDiv.innerHTML = '<p>' + text + '</p>';
+  messageDiv.className = 'subscribe-message ' + type;
+  messageDiv.classList.remove('hidden');
 }
 
 // ===== INITIALIZATION =====
