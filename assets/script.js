@@ -1061,15 +1061,6 @@ function initMobileMenu() {
 }
 
 // ===== NEWSLETTER FLOATING WIDGET =====
-// Zoho Configuration for JCT Newsletter
-const ZOHO_CONFIG = {
-  action: 'https://anrcr-zgpvh.maillist-manage.net/weboptin.zc',
-  zx: '135bffd9e',
-  zcld: '1156b347af4ac1ec0',
-  zctd: '1156b347af4ab4f79',
-  formIx: '3z942a48aa15968fb3fe118c8eb392875012ddd0e34460b61e74ef5d3d2807677b'
-};
-
 const FLOAT_DELAY = 3000; // Show after 3 seconds
 const DISMISS_DAYS = 7;   // Don't show again for 7 days after dismiss
 
@@ -1143,11 +1134,8 @@ function createFloatWidget() {
       '</div>' +
       '<p>Get the latest on new blends, special offers & coffee stories.</p>' +
       '<form class="zoho-subscribe-form">' +
-        '<div class="form-row">' +
-          '<input type="text" name="FIRSTNAME" placeholder="First Name" required>' +
-          '<input type="text" name="LASTNAME" placeholder="Last Name" required>' +
-        '</div>' +
-        '<input type="email" name="CONTACT_EMAIL" placeholder="Email Address" required>' +
+        '<input type="email" name="CONTACT_EMAIL" placeholder="Email Address *" required>' +
+        '<input type="text" name="LASTNAME" placeholder="Name" required>' +
         '<div class="form-buttons">' +
           '<button type="submit" class="subscribe-submit-btn"><i class="fas fa-paper-plane"></i> Subscribe</button>' +
         '</div>' +
@@ -1186,8 +1174,7 @@ function handleNewsletterSubmit(e, container, onSuccess) {
   
   const formData = new FormData(form);
   const email = formData.get('CONTACT_EMAIL');
-  const firstName = formData.get('FIRSTNAME') || '';
-  const lastName = formData.get('LASTNAME') || '';
+  const name = formData.get('LASTNAME') || '';
   
   // Validate email
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -1199,35 +1186,35 @@ function handleNewsletterSubmit(e, container, onSuccess) {
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Joining...';
   submitBtn.disabled = true;
   
-  // Create hidden iframe for Zoho submission
-  const iframeName = 'zcSignup_' + Date.now();
+  // Create hidden iframe (same approach as Zoho's official embed)
+  const iframeName = '_zcSignup_' + Date.now();
   const iframe = document.createElement('iframe');
   iframe.name = iframeName;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
   
-  // Create form with all Zoho required fields
+  // Create form matching EXACTLY what Zoho expects
   const hiddenForm = document.createElement('form');
   hiddenForm.method = 'POST';
-  hiddenForm.action = ZOHO_CONFIG.action;
+  hiddenForm.action = 'https://anrcr-zgpvh.maillist-manage.net/weboptin.zc';
   hiddenForm.target = iframeName;
   hiddenForm.style.display = 'none';
   
+  // These fields match the official Zoho embed exactly
   const fields = {
     'CONTACT_EMAIL': email,
-    'FIRSTNAME': firstName,
-    'LASTNAME': lastName,
+    'LASTNAME': name,
     'submitType': 'optinCustomView',
     'emailReportId': '',
     'formType': 'QuickForm',
-    'zx': ZOHO_CONFIG.zx,
+    'zx': '135bffd9e',
     'zcvers': '3.0',
     'oldListIds': '',
     'mode': 'OptinCreateView',
-    'zcld': ZOHO_CONFIG.zcld,
-    'zctd': ZOHO_CONFIG.zctd,
+    'zcld': '1156b347af4ac1ec0',
+    'zctd': '1156b347af4ab4f79',
     'zc_trackCode': 'ZCFORMVIEW',
-    'zc_formIx': ZOHO_CONFIG.formIx,
+    'zc_formIx': '3z942a48aa15968fb3fe118c8eb392875012ddd0e34460b61e74ef5d3d2807677b',
     'viewFrom': 'URL_ACTION'
   };
   
@@ -1242,7 +1229,7 @@ function handleNewsletterSubmit(e, container, onSuccess) {
   document.body.appendChild(hiddenForm);
   hiddenForm.submit();
   
-  // Show success after brief delay
+  // Show success after submission
   setTimeout(function() {
     if (iframe.parentNode) iframe.remove();
     if (hiddenForm.parentNode) hiddenForm.remove();
@@ -1256,7 +1243,7 @@ function handleNewsletterSubmit(e, container, onSuccess) {
     setNewsletterDismissed();
     
     if (typeof onSuccess === 'function') onSuccess();
-  }, 2000);
+  }, 2500);
 }
 
 function showSubscribeMessage(messageDiv, text, type) {

@@ -2763,15 +2763,10 @@ a:focus {
 }
 
 /* Form Styles */
-.zoho-subscribe-form .form-row {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
 .zoho-subscribe-form input {
   width: 100%;
   padding: 0.7rem;
+  margin-bottom: 0.75rem;
   border: 2px solid rgba(244, 208, 63, 0.5);
   border-radius: 8px;
   font-size: 0.9rem;
@@ -2791,12 +2786,8 @@ a:focus {
   color: rgba(31, 74, 71, 0.6);
 }
 
-.zoho-subscribe-form input[type="email"] {
-  margin-bottom: 0.75rem;
-}
-
 .zoho-subscribe-form .form-buttons {
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 .subscribe-submit-btn {
@@ -2884,10 +2875,5 @@ a:focus {
     left: 10px;
     right: 10px;
     width: auto;
-  }
-  
-  .zoho-subscribe-form .form-row {
-    flex-direction: column;
-    gap: 0.75rem;
   }
 }
