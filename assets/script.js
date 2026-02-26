@@ -326,14 +326,14 @@ function renderProducts(products, containerId, category) {
       stockClass = 'stock-good';
       stockText = 'Made to Order';
     } else {
-      const totalStock = variantsToUse.reduce((sum, variant) => sum + (variant.quantityAvailable || 0), 0);
-      
-      if (totalStock < 10 && totalStock > 0) {
-        stockClass = 'stock-warning';
-        stockText = 'Low Stock';
-      } else if (totalStock === 0) {
+      const anyAvailable = variantsToUse.some(v => v.availableForSale);
+      const totalTrackedStock = variantsToUse.reduce((sum, v) => sum + (v.quantityAvailable || 0), 0);
+      if (!anyAvailable) {
         stockClass = 'stock-out';
         stockText = 'Out of Stock';
+      } else if (totalTrackedStock > 0 && totalTrackedStock < 10) {
+        stockClass = 'stock-warning';
+        stockText = 'Low Stock';
       }
     }
 
@@ -472,7 +472,7 @@ function updateProductPrice(handle) {
       priceDisplay.classList.add('price-active');
       
       // POD products are always available
-      const isAvailable = isPrintOnDemand ? true : (variant.availableForSale && variant.quantityAvailable > 0);
+      const isAvailable = isPrintOnDemand ? true : variant.availableForSale;
       button.disabled = !isAvailable;
       button.style.background = button.disabled ? '#6c757d' : '';
       button.style.cursor = button.disabled ? 'not-allowed' : 'pointer';
@@ -535,7 +535,7 @@ function updateProductPrice(handle) {
     priceDisplay.classList.add('price-active');
     
     // POD products are always available
-    const isAvailable = isPrintOnDemand ? true : (matchingVariant.availableForSale && matchingVariant.quantityAvailable > 0);
+    const isAvailable = isPrintOnDemand ? true : matchingVariant.availableForSale;
     
     button.disabled = !isAvailable;
     button.style.background = button.disabled ? '#6c757d' : '';
@@ -572,7 +572,7 @@ function updateProductPrice(handle) {
       priceDisplay.textContent = `$${price.toFixed(2)}`;
       priceDisplay.classList.add('price-active');
       
-      const isAvailable = isPrintOnDemand ? true : (variant.availableForSale && variant.quantityAvailable > 0);
+      const isAvailable = isPrintOnDemand ? true : variant.availableForSale;
       
       button.disabled = !isAvailable;
       button.style.background = button.disabled ? '#6c757d' : '';
@@ -755,40 +755,62 @@ function loadCart() {
 
 // ===== PAGE LOADERS =====
 async function loadCoffeePage() {
-  const container = document.getElementById('coffee-products');
-  if (container) {
-    container.innerHTML = `
-      <div class="loading-state">
-        <i class="fas fa-coffee fa-spin"></i>
-        <h3>Loading Fresh Coffee Selection...</h3>
-      </div>
-    `;
+  const localContainer = document.getElementById('local-coffee-products');
+  const baseContainer  = document.getElementById('base-coffee-products');
+  const legacyContainer = document.getElementById('coffee-products');
+
+  // ── Legacy single-grid fallback ──
+  if (!localContainer && !baseContainer && legacyContainer) {
+    legacyContainer.innerHTML = `<div class="loading-state"><i class="fas fa-coffee fa-spin"></i><h3>Loading Coffee...</h3></div>`;
+    try {
+      const products = await fetchShopifyProducts();
+      const coffeeProducts = products.filter(({ node }) => {
+        const tags = node.tags.map(t => t.toLowerCase());
+        return tags.some(t => t.includes('coffee')) || node.title.toLowerCase().includes('coffee') || node.productType.toLowerCase().includes('coffee');
+      });
+      renderProducts(coffeeProducts, 'coffee-products', 'coffee');
+      setTimeout(() => sortCardsByName('coffee-products'), 500);
+    } catch (e) {
+      legacyContainer.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Products</h3><button onclick="loadCoffeePage()">Try Again</button></div>`;
+    }
+    return;
   }
+
+  // ── Two-section layout ──
+  if (localContainer) localContainer.innerHTML = `<div class="loading-state"><i class="fas fa-coffee fa-spin"></i><h3>Loading Local Blends...</h3><p>Getting the latest from our roasters...</p></div>`;
+  if (baseContainer)  baseContainer.innerHTML  = `<div class="loading-state"><i class="fas fa-coffee fa-spin"></i><h3>Loading Single Origin Selection...</h3><p>Getting the latest inventory from our roasters...</p></div>`;
 
   try {
     const products = await fetchShopifyProducts();
-    const coffeeProducts = products.filter(({ node }) => {
-      const tags = node.tags.map(tag => tag.toLowerCase());
-      const title = node.title.toLowerCase();
-      const productType = node.productType.toLowerCase();
-      
-      return tags.some(tag => tag.includes('coffee')) ||
-             title.includes('coffee') ||
-             productType.includes('coffee');
+
+    // All coffee
+    const allCoffee = products.filter(({ node }) => {
+      const tags = node.tags.map(t => t.toLowerCase());
+      return tags.some(t => t.includes('coffee')) || node.title.toLowerCase().includes('coffee') || node.productType.toLowerCase().includes('coffee');
     });
-    
-    renderProducts(coffeeProducts, 'coffee-products', 'coffee');
-    setTimeout(() => sortCardsByName('coffee-products'), 500);
-  } catch (error) {
-    if (container) {
-      container.innerHTML = `
-        <div class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Error Loading Products</h3>
-          <button onclick="loadCoffeePage()">Try Again</button>
-        </div>
-      `;
+
+    // Local blends: must have a tag that equals exactly "local"
+    const localBlends = allCoffee.filter(({ node }) =>
+      node.tags.some(t => t.toLowerCase().trim() === 'local')
+    );
+
+    // Base/single-origin: has "base" tag OR does not have "local" tag
+    const baseBlends = allCoffee.filter(({ node }) => {
+      const tags = node.tags.map(t => t.toLowerCase().trim());
+      return tags.includes('base') || !tags.includes('local');
+    });
+
+    if (localContainer) {
+      renderProducts(localBlends, 'local-coffee-products', 'coffee');
+      setTimeout(() => sortCardsByName('local-coffee-products'), 500);
     }
+    if (baseContainer) {
+      renderProducts(baseBlends, 'base-coffee-products', 'coffee');
+      setTimeout(() => sortCardsByName('base-coffee-products'), 500);
+    }
+  } catch (error) {
+    if (localContainer) localContainer.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Local Blends</h3><button onclick="loadCoffeePage()">Try Again</button></div>`;
+    if (baseContainer)  baseContainer.innerHTML  = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Single Origin</h3><button onclick="loadCoffeePage()">Try Again</button></div>`;
   }
 }
 
@@ -1060,10 +1082,246 @@ function initMobileMenu() {
   }
 }
 
+// ===== NEWSLETTER FLIP CARD BANNER =====
+// Zoho Campaigns Configuration
+var ZOHO_CONFIG = {
+  action: 'https://anrcr-zgpvh.maillist-manage.net/weboptin.zc',
+  zx: '135bffd9e',
+  zcld: '1156b347af4ac1ec0',
+  zctd: '1156b347af4ab4f79',
+  formIx: '3z942a48aa15968fb3fe118c8eb392875012ddd0e34460b61e74ef5d3d2807677b'
+};
+
+function initNewsletterBanner() {
+  // Check if banner was dismissed
+  var dismissed = localStorage.getItem('jct-newsletter-dismissed');
+  
+  // Don't show if dismissed or on cart/thanks pages
+  var path = window.location.pathname;
+  if (dismissed === 'true' || path.includes('cart') || path.includes('thanks') || path.includes('404')) {
+    return;
+  }
+  
+  // Create flip card banner
+  var banner = document.createElement('div');
+  banner.className = 'newsletter-banner';
+  banner.innerHTML = '\
+    <div class="newsletter-card">\
+      <!-- FRONT: Initial view with subscribe button -->\
+      <div class="newsletter-face newsletter-front">\
+        <button class="newsletter-close" aria-label="Close newsletter banner">\
+          <i class="fas fa-times"></i>\
+        </button>\
+        <div class="newsletter-icon">\
+          <i class="fas fa-envelope"></i>\
+        </div>\
+        <div class="newsletter-content">\
+          <h3>Stay in Touch!</h3>\
+          <p>Get the latest on new blends, special offers, and coffee stories</p>\
+          <button class="newsletter-cta-btn" id="show-form-btn">\
+            <i class="fas fa-paper-plane"></i>\
+            Subscribe\
+          </button>\
+        </div>\
+      </div>\
+      \
+      <!-- BACK: Form view -->\
+      <div class="newsletter-face newsletter-back">\
+        <button class="newsletter-close" aria-label="Close newsletter banner">\
+          <i class="fas fa-times"></i>\
+        </button>\
+        <div class="newsletter-form-container">\
+          <h3><i class="fas fa-envelope"></i> Join Our Newsletter</h3>\
+          <form id="newsletter-signup-form">\
+            <input \
+              type="email" \
+              name="CONTACT_EMAIL" \
+              placeholder="Email *" \
+              required \
+              class="newsletter-input"\
+            >\
+            <input \
+              type="text" \
+              name="FIRSTNAME" \
+              placeholder="First Name" \
+              class="newsletter-input"\
+            >\
+            <input \
+              type="text" \
+              name="LASTNAME" \
+              placeholder="Last Name" \
+              class="newsletter-input"\
+            >\
+            <button type="submit" class="newsletter-submit-btn" id="submit-newsletter">\
+              <i class="fas fa-check"></i>\
+              Subscribe\
+            </button>\
+            <button type="button" class="newsletter-back-btn" id="back-to-front">\
+              <i class="fas fa-arrow-left"></i>\
+              Back\
+            </button>\
+          </form>\
+        </div>\
+      </div>\
+      \
+      <!-- THANK YOU: Success view -->\
+      <div class="newsletter-face newsletter-thanks">\
+        <div class="newsletter-thanks-content">\
+          <div class="newsletter-thanks-icon">\
+            <i class="fas fa-check-circle"></i>\
+          </div>\
+          <h3>Thank You for Signing Up!</h3>\
+          <p>You\'re now part of the Jubilee Coffee &amp; Tea family. Welcome aboard!</p>\
+          <button class="newsletter-close-final" id="close-thanks">\
+            <i class="fas fa-times"></i>\
+            Close\
+          </button>\
+        </div>\
+      </div>\
+    </div>\
+  ';
+  
+  document.body.appendChild(banner);
+  
+  // Show banner after 3 seconds
+  setTimeout(function() {
+    banner.classList.add('show');
+  }, 3000);
+  
+  var card = banner.querySelector('.newsletter-card');
+  
+  // Handle close buttons
+  var closeButtons = banner.querySelectorAll('.newsletter-close');
+  closeButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      dismissBanner();
+    });
+  });
+  
+  // Show form button
+  var showFormBtn = document.getElementById('show-form-btn');
+  if (showFormBtn) {
+    showFormBtn.addEventListener('click', function() {
+      card.classList.add('flipped-to-form');
+    });
+  }
+  
+  // Back to front button
+  var backBtn = document.getElementById('back-to-front');
+  if (backBtn) {
+    backBtn.addEventListener('click', function() {
+      card.classList.remove('flipped-to-form');
+    });
+  }
+  
+  // Form submission - Direct Zoho iframe method (no redirect, no auto-email)
+  var form = document.getElementById('newsletter-signup-form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      var submitBtn = document.getElementById('submit-newsletter');
+      var email = form.querySelector('input[name="CONTACT_EMAIL"]').value.trim();
+      var firstName = form.querySelector('input[name="FIRSTNAME"]').value.trim();
+      var lastName = form.querySelector('input[name="LASTNAME"]').value.trim();
+      
+      // Validate email
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showNotification('Please enter a valid email address', 'warning');
+        return;
+      }
+      
+      // Disable button and show loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+      
+      // Create hidden iframe to receive the Zoho response (prevents redirect)
+      var iframeName = 'zcSignup_' + Date.now();
+      var iframe = document.createElement('iframe');
+      iframe.name = iframeName;
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      
+      // Build a hidden form with all Zoho required fields
+      var hiddenForm = document.createElement('form');
+      hiddenForm.method = 'POST';
+      hiddenForm.action = ZOHO_CONFIG.action;
+      hiddenForm.target = iframeName;
+      hiddenForm.style.display = 'none';
+      
+      var fields = {
+        'CONTACT_EMAIL': email,
+        'FIRSTNAME': firstName,
+        'LASTNAME': lastName,
+        'submitType': 'optinCustomView',
+        'emailReportId': '',
+        'formType': 'QuickForm',
+        'zx': ZOHO_CONFIG.zx,
+        'zcvers': '3.0',
+        'oldListIds': '',
+        'mode': 'OptinCreateView',
+        'zcld': ZOHO_CONFIG.zcld,
+        'zctd': ZOHO_CONFIG.zctd,
+        'zc_trackCode': 'ZCFORMVIEW',
+        'zc_formIx': ZOHO_CONFIG.formIx,
+        'viewFrom': 'URL_ACTION'
+      };
+      
+      for (var key in fields) {
+        if (fields.hasOwnProperty(key)) {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = fields[key];
+          hiddenForm.appendChild(input);
+        }
+      }
+      
+      document.body.appendChild(hiddenForm);
+      hiddenForm.submit();
+      
+      // After a short delay, flip to thank you and clean up
+      setTimeout(function() {
+        // Clean up iframe and hidden form
+        if (iframe.parentNode) iframe.remove();
+        if (hiddenForm.parentNode) hiddenForm.remove();
+        
+        // Flip card to thank you face
+        card.classList.remove('flipped-to-form');
+        card.classList.add('flipped-to-thanks');
+        
+        // Reset the form for if they somehow see it again
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Subscribe';
+      }, 2000);
+    });
+  }
+  
+  // Close from thank you
+  var closeThanksBtn = document.getElementById('close-thanks');
+  if (closeThanksBtn) {
+    closeThanksBtn.addEventListener('click', function() {
+      dismissBanner();
+    });
+  }
+  
+  function dismissBanner() {
+    banner.classList.remove('show');
+    setTimeout(function() {
+      banner.style.display = 'none';
+      localStorage.setItem('jct-newsletter-dismissed', 'true');
+    }, 500);
+  }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize mobile menu immediately
   initMobileMenu();
+  
+  // Initialize newsletter banner
+  initNewsletterBanner();
   
   // Load cart
   loadCart();

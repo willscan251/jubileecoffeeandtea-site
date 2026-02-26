@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
 
-  <!-- Apple “Add to Home” icon -->
+  <!-- Apple "Add to Home" icon -->
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
 
   <!-- Safari pinned-tab icon -->
@@ -18,10 +18,9 @@
   <!-- PWA manifest -->
   <link rel="manifest" href="site.webmanifest">
 
-    <!-- Tile & theme colors -->
+  <!-- Tile & theme colors -->
   <meta name="msapplication-TileColor" content="#123945">
   <meta name="theme-color" content="#123945">
-
 
   <!-- External Resources -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -62,33 +61,59 @@
       Taste the Jubilee!</p>
     </div>
 
-    <!-- Special Announcement Section -->
-    <div class="coffee-announcement">
-      <div class="page-header">
-        <div class="announcement-icon">
-          <i class="fas fa-map-marker-alt"></i>
+    <!-- LOCAL BLENDS SECTION -->
+    <div class="products-container">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Local Inspired Blends</h2>
+        <p class="section-subtitle">Signature blends inspired by the beauty and spirit of Mobile Bay and the Eastern Shore</p>
+      </div>
+      <div class="product-grid" id="local-coffee-products">
+        <div class="loading-state">
+          <i class="fas fa-coffee fa-spin"></i>
+          <h3>Loading Local Blends...</h3>
+          <p>Getting the latest from our roasters...</p>
         </div>
-        <div class="announcement-text">
-          <h2>Coming Soon: Local Inspired Blends</h2>
-          <p>We're crafting special coffee blends inspired by the Mobile Bay area.<br>These locally-inspired blends will capture the spirit of our beautiful region.</p>
-          <div class="announcement-tag">
-            <i class="fas fa-clock"></i>
-            <span>Launching Soon</span>
-          </div>
-        </div>
-        <br><p>*scroll down for great single origin and standard blend selections*</p>
       </div>
     </div>
 
-    <!-- Coffee Products Grid -->
+    <!-- DIVIDER -->
+    <div class="section-divider">
+      <span class="divider-line"></span>
+      <span class="divider-icon"><i class="fas fa-coffee"></i></span>
+      <span class="divider-line"></span>
+    </div>
+
+    <!-- SINGLE ORIGIN SECTION -->
     <div class="products-container">
-      <div class="product-grid" id="coffee-products">
-        <!-- Loading state will be replaced by JavaScript -->
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-globe-americas"></i> Single Origin Selections</h2>
+        <p class="section-subtitle">Premium single origin beans from the world's finest growing regions</p>
+      </div>
+      <div class="product-grid" id="base-coffee-products">
         <div class="loading-state">
           <i class="fas fa-coffee fa-spin"></i>
-          <h3>Loading Fresh Coffee Selection...</h3>
+          <h3>Loading Single Origin Selection...</h3>
           <p>Getting the latest inventory from our roasters...</p>
         </div>
+      </div>
+    </div>
+
+    <!-- Single Origin Suggestion Section -->
+    <div class="coffee-suggestion">
+      <div class="coming-soon-container">
+        <div class="coming-soon-icon">
+          <i class="fas fa-globe-americas"></i>
+        </div>
+        <h2>Have a Favorite Origin in Mind?</h2>
+        <p>
+          We're always exploring new growing regions and unique beans to add to our lineup. 
+          Every new single origin we bring in opens the door to crafting fresh signature blends 
+          — so your suggestion could inspire the next great Jubilee creation.
+        </p>
+        <a href="contact.html" class="tea-contact-btn">
+          <i class="fas fa-envelope"></i>
+          Tell Us What You'd Love to See
+        </a>
       </div>
     </div>
   </main>
