@@ -815,40 +815,64 @@ async function loadCoffeePage() {
 }
 
 async function loadTeaPage() {
-  const container = document.getElementById('tea-products');
-  if (container) {
-    container.innerHTML = `
-      <div class="loading-state">
-        <i class="fas fa-leaf fa-spin"></i>
-        <h3>Loading Premium Tea Collection...</h3>
-      </div>
-    `;
+  const localContainer = document.getElementById('local-tea-products');
+  const baseContainer  = document.getElementById('base-tea-products');
+  const legacyContainer = document.getElementById('tea-products');
+
+  // ── Legacy single-grid fallback ──
+  if (!localContainer && !baseContainer && legacyContainer) {
+    legacyContainer.innerHTML = `<div class="loading-state"><i class="fas fa-leaf fa-spin"></i><h3>Loading Premium Tea Collection...</h3></div>`;
+    try {
+      const products = await fetchShopifyProducts();
+      const teaProducts = products.filter(({ node }) => {
+        const tags = node.tags.map(t => t.toLowerCase());
+        return tags.some(t => t.includes('tea')) || node.title.toLowerCase().includes('tea') || node.productType.toLowerCase().includes('tea');
+      });
+      renderProducts(teaProducts, 'tea-products', 'tea');
+      setTimeout(() => sortCardsByName('tea-products'), 500);
+    } catch (e) {
+      legacyContainer.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Products</h3><button onclick="loadTeaPage()">Try Again</button></div>`;
+    }
+    return;
   }
+
+  // ── Two-section layout (matches coffee page) ──
+  if (localContainer) localContainer.innerHTML = `<div class="loading-state"><i class="fas fa-leaf fa-spin"></i><h3>Loading Signature Blends...</h3><p>Steeping up the latest from our blending bench...</p></div>`;
+  if (baseContainer)  baseContainer.innerHTML  = `<div class="loading-state"><i class="fas fa-leaf fa-spin"></i><h3>Loading Pure Teas...</h3><p>Gathering the latest from our tea garden...</p></div>`;
 
   try {
     const products = await fetchShopifyProducts();
-    const teaProducts = products.filter(({ node }) => {
-      const tags = node.tags.map(tag => tag.toLowerCase());
-      const title = node.title.toLowerCase();
-      const productType = node.productType.toLowerCase();
-      
-      return tags.some(tag => tag.includes('tea')) ||
-             title.includes('tea') ||
-             productType.includes('tea');
+
+    // All tea — exclude coffee so titles like "tea" in coffee blends don't leak in
+    const allTea = products.filter(({ node }) => {
+      const tags = node.tags.map(t => t.toLowerCase().trim());
+      const isCoffee = tags.some(t => t.includes('coffee')) || node.productType.toLowerCase().includes('coffee');
+      if (isCoffee) return false;
+      return tags.some(t => t.includes('tea')) || node.productType.toLowerCase().includes('tea');
     });
-    
-    renderProducts(teaProducts, 'tea-products', 'tea');
-    setTimeout(() => sortCardsByName('tea-products'), 500);
-  } catch (error) {
-    if (container) {
-      container.innerHTML = `
-        <div class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Error Loading Products</h3>
-          <button onclick="loadTeaPage()">Try Again</button>
-        </div>
-      `;
+
+    // Signature blends: must have a tag that equals exactly "local"
+    const localBlends = allTea.filter(({ node }) =>
+      node.tags.some(t => t.toLowerCase().trim() === 'local')
+    );
+
+    // Pure/base teas: has "base" tag OR does not have "local" tag
+    const baseTeas = allTea.filter(({ node }) => {
+      const tags = node.tags.map(t => t.toLowerCase().trim());
+      return tags.includes('base') || !tags.includes('local');
+    });
+
+    if (localContainer) {
+      renderProducts(localBlends, 'local-tea-products', 'tea');
+      setTimeout(() => sortCardsByName('local-tea-products'), 500);
     }
+    if (baseContainer) {
+      renderProducts(baseTeas, 'base-tea-products', 'tea');
+      setTimeout(() => sortCardsByName('base-tea-products'), 500);
+    }
+  } catch (error) {
+    if (localContainer) localContainer.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Signature Blends</h3><button onclick="loadTeaPage()">Try Again</button></div>`;
+    if (baseContainer)  baseContainer.innerHTML  = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Pure Teas</h3><button onclick="loadTeaPage()">Try Again</button></div>`;
   }
 }
 
