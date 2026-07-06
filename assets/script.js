@@ -107,34 +107,28 @@ function createImageCarousel(images, productHandle) {
     `;
   }
 
-  if (images.length === 1) {
-    return `
-      <div class="product-image">
-        <img src="${images[0].node.url}" alt="${images[0].node.altText || 'Product image'}" loading="lazy">
-      </div>
-    `;
-  }
-
   const carouselId = `carousel-${productHandle}`;
+  const hasMultiple = images.length > 1;
+
   const imagesHtml = images.map((image, index) => `
     <div class="carousel-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
       <img src="${image.node.url}" alt="${image.node.altText || `Product image ${index + 1}`}" loading="lazy">
     </div>
   `).join('');
 
-  const thumbnailsHtml = `
+  const thumbnailsHtml = hasMultiple ? `
     <div class="carousel-thumbnails">
       ${images.map((image, index) => `
-        <button class="carousel-thumb ${index === 0 ? 'active' : ''}" 
+        <button class="carousel-thumb ${index === 0 ? 'active' : ''}"
                 onclick="goToSlide('${carouselId}', ${index})"
                 data-slide="${index}">
           <img src="${image.node.url}" alt="Thumbnail ${index + 1}" loading="lazy">
         </button>
       `).join('')}
     </div>
-  `;
+  ` : '';
 
-  const navigationHtml = `
+  const navigationHtml = hasMultiple ? `
     <button class="carousel-prev" onclick="previousSlide('${carouselId}')" aria-label="Previous image">
       <i class="fas fa-chevron-left"></i>
     </button>
@@ -143,13 +137,13 @@ function createImageCarousel(images, productHandle) {
     </button>
     <div class="carousel-indicators">
       ${images.map((_, index) => `
-        <button class="carousel-dot ${index === 0 ? 'active' : ''}" 
+        <button class="carousel-dot ${index === 0 ? 'active' : ''}"
                 onclick="goToSlide('${carouselId}', ${index})"
                 data-slide="${index}"
                 aria-label="Go to image ${index + 1}"></button>
       `).join('')}
     </div>
-  `;
+  ` : '';
 
   return `
     <div class="product-image-carousel" id="${carouselId}" data-current-slide="0">
