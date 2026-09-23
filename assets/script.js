@@ -670,7 +670,14 @@ function addToCart(button) {
 
   updateCartDisplay();
   saveCart();
-  
+
+  // The step Cloudflare and Shopify both miss: a bag in a basket. Optional
+  // chaining on purpose — if assets/track.js did not load, the shop carries
+  // on exactly as it did before.
+  window.jctTrack?.('add_to_cart', {
+    handle: item.handle, variantId: String(variantId), quantity: 1, value: price
+  });
+
   const originalText = button.innerHTML;
   button.innerHTML = '<i class="fas fa-check"></i> Added!';
   button.style.background = 'var(--success)';
@@ -1065,7 +1072,20 @@ function proceedToCheckout() {
       return `${variantId}:${item.quantity}`;
     }).join(',');
     
-    const checkoutUrl = `https://${SHOPIFY_CONFIG.domain}/cart/${cartItems}`;
+    // The visit id rides along so an order can be tied back to the visit
+    // that produced it. Sent two ways because which of them Shopify keeps is
+    // Shopify's business: as a cart attribute, and as a plain query
+    // parameter that lands in the order's landing_site. The app reports how
+    // often it actually arrives rather than assuming it does.
+    const vid = window.jctVisitId?.();
+    const tag = vid ? `?attributes[jct_vid]=${encodeURIComponent(vid)}&jct_vid=${encodeURIComponent(vid)}` : '';
+    const checkoutUrl = `https://${SHOPIFY_CONFIG.domain}/cart/${cartItems}${tag}`;
+
+    window.jctTrack?.('checkout_start', {
+      quantity: window.jubileeCart.items.reduce((n, i) => n + (i.quantity || 1), 0),
+      value: window.jubileeCart.total || null
+    });
+
     window.location.href = checkoutUrl;
   } catch (error) {
     showNotification('Checkout error. Please try again or contact us.', 'error');
